@@ -1,4 +1,4 @@
-QtNodes
+QtNodes_HONGKELI
 #######
 
 https://github.com/paceholder/nodeeditor/actions/workflows/cmake_build.yml/badge.svg
