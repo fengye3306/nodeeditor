@@ -4,7 +4,7 @@
 
 #include <QtGui/QFontMetrics>
 
-namespace QtNodes {
+    namespace QtNodes {
 
 class AbstractGraphModel;
 class BasicGraphicsScene;

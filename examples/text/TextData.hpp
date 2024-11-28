@@ -14,7 +14,9 @@ public:
 
     TextData(QString const &text)
         : _text(text)
-    {}
+    {
+        
+    }
 
     NodeDataType type() const override { return NodeDataType{"text", "Text"}; }
 

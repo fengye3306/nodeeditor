@@ -3,7 +3,7 @@
 TextDisplayDataModel::TextDisplayDataModel()
     : _label(new QLabel("Resulting Text"))
 {
-    _label->setMargin(3);
+    _label->setMargin(6);
 }
 
 unsigned int TextDisplayDataModel::nPorts(PortType portType) const

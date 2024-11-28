@@ -76,6 +76,7 @@ void NodeStyle::setNodeStyle(QString jsonText)
         values[#variable] = variable.name(); \
     }
 
+// 这段宏代码利用了 C++ 预处理器的特性，特别是 # 操作符，用来将变量名转换成字符串
 #define NODE_STYLE_READ_FLOAT(values, variable) \
     { \
         auto valueRef = values[#variable]; \
@@ -113,6 +114,10 @@ void NodeStyle::loadJson(QJsonObject const &json)
     NODE_STYLE_READ_FLOAT(obj, ConnectionPointDiameter);
 
     NODE_STYLE_READ_FLOAT(obj, Opacity);
+
+    // 自定义添加
+    NODE_STYLE_READ_FLOAT(obj, FontSize_Node_Title);        // 节点标题文字大小
+    NODE_STYLE_READ_FLOAT(obj, FontSize_Node_LinkCirMsg); 
 }
 
 QJsonObject NodeStyle::toJson() const
@@ -138,6 +143,10 @@ QJsonObject NodeStyle::toJson() const
     NODE_STYLE_WRITE_FLOAT(obj, ConnectionPointDiameter);
 
     NODE_STYLE_WRITE_FLOAT(obj, Opacity);
+
+     // 自定义添加
+    NODE_STYLE_WRITE_FLOAT(obj, FontSize_Node_Title);        // 节点标题文字大小
+    NODE_STYLE_WRITE_FLOAT(obj, FontSize_Node_LinkCirMsg);   // 节点 连接点 描述文字大小
 
     QJsonObject root;
     root["NodeStyle"] = obj;

@@ -21,21 +21,15 @@ using QtNodes::PortType;
 class TextDisplayDataModel : public NodeDelegateModel
 {
     Q_OBJECT
-
 public:
     TextDisplayDataModel();
 
     virtual ~TextDisplayDataModel() {}
-
 public:
     QString caption() const override { return QString("Text Display"); }
-
     bool captionVisible() const override { return false; }
-
     static QString Name() { return QString("TextDisplayDataModel"); }
-
     QString name() const override { return TextDisplayDataModel::Name(); }
-
 public:
     unsigned int nPorts(PortType portType) const override;
 

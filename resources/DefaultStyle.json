@@ -24,7 +24,9 @@
 
     "ConnectionPointDiameter": 8.0,
 
-    "Opacity": 0.8
+    "Opacity": 0.8,
+    "FontSize_Node_Title": 10,
+    "FontSize_Node_LinkCirMsg": 9
   },
   "ConnectionStyle": {
     "ConstructionColor": "gray",

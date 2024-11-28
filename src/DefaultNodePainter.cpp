@@ -21,8 +21,9 @@ void DefaultNodePainter::paint(QPainter *painter, NodeGraphicsObject &ngo) const
     //AbstractNodeGeometry & geometry = ngo.nodeScene()->nodeGeometry();
     //geometry.recomputeSizeIfFontChanged(painter->font());
 
+    // 绘制节点外边框
     drawNodeRect(painter, ngo);
-
+    
     drawConnectionPoints(painter, ngo);
 
     drawFilledConnectionPoints(painter, ngo);
@@ -34,7 +35,10 @@ void DefaultNodePainter::paint(QPainter *painter, NodeGraphicsObject &ngo) const
     drawResizeRect(painter, ngo);
 }
 
-void DefaultNodePainter::drawNodeRect(QPainter *painter, NodeGraphicsObject &ngo) const
+
+// 绘制节点的外边框 —— 纯纯的外边框 
+void DefaultNodePainter::drawNodeRect
+    (QPainter *painter, NodeGraphicsObject &ngo) const
 {
     AbstractGraphModel &model = ngo.graphModel();
 
@@ -189,33 +193,46 @@ void DefaultNodePainter::drawFilledConnectionPoints(QPainter *painter, NodeGraph
         }
     }
 }
-
 void DefaultNodePainter::drawNodeCaption(QPainter *painter, NodeGraphicsObject &ngo) const
 {
+    // 获取与节点相关的模型和几何信息
     AbstractGraphModel &model = ngo.graphModel();
     NodeId const nodeId = ngo.nodeId();
     AbstractNodeGeometry &geometry = ngo.nodeScene()->nodeGeometry();
 
-    if (!model.nodeData(nodeId, NodeRole::CaptionVisible).toBool())
-        return;
 
-    QString const name = model.nodeData(nodeId, NodeRole::Caption).toString();
-
-    QFont f = painter->font();
-    f.setBold(true);
-
-    QPointF position = geometry.captionPosition(nodeId);
-
+    // 从节点数据中获取样式信息，构造 NodeStyle 对象
     QJsonDocument json = QJsonDocument::fromVariant(model.nodeData(nodeId, NodeRole::Style));
     NodeStyle nodeStyle(json.object());
 
+    // 检查节点是否应显示标题
+    if (!model.nodeData(nodeId, NodeRole::CaptionVisible).toBool())
+        return;
+
+    // 获取节点的标题文本
+    QString const name = model.nodeData(nodeId, NodeRole::Caption).toString();
+
+    // 设置字体样式：粗体和大小
+    QFont f = painter->font();
+    f.setBold(true);
+    float float_PainterFontSize = f.pointSize();
+    f.setPointSize(nodeStyle.FontSize_Node_Title); // 设置标题字体大小
+
+    // 获取标题的位置
+    QPointF position = geometry.captionPosition(nodeId);
+
+    // 设置画笔字体和颜色，并绘制标题文本
     painter->setFont(f);
     painter->setPen(nodeStyle.FontColor);
     painter->drawText(position, name);
+    
 
+    // 取消粗体设置，恢复原始字体
     f.setBold(false);
+    f.setPointSize(float_PainterFontSize);
     painter->setFont(f);
 }
+
 
 void DefaultNodePainter::drawEntryLabels(QPainter *painter, NodeGraphicsObject &ngo) const
 {
@@ -252,7 +269,16 @@ void DefaultNodePainter::drawEntryLabels(QPainter *painter, NodeGraphicsObject &
                 s = portData.value<NodeDataType>().name;
             }
 
+            // 设置字体样式：粗体和大小
+            QFont f = painter->font();
+            // float old_Fontsize = f.pixelSize();
+
+            f.setPixelSize(nodeStyle.FontSize_Node_LinkCirMsg);
+            painter->setFont(f);
+
             painter->drawText(p, s);
+            // f.setPixelSize(old_Fontsize);
+            painter->setFont(f);
         }
     }
 }

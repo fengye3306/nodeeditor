@@ -58,7 +58,9 @@ static void setStyle()
       "PenWidth": 2.0,
       "HoveredPenWidth": 2.5,
       "ConnectionPointDiameter": 10.0,
-      "Opacity": 1.0
+      "Opacity": 1.0,
+      "FontSize_Node_Title": 1.0,
+      "FontSize_Node_LinkCirMsg": 1.0
     }
   }
   )");

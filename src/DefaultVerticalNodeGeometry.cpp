@@ -161,14 +161,19 @@ QRectF DefaultVerticalNodeGeometry::captionRect(NodeId const nodeId) const
 
 QPointF DefaultVerticalNodeGeometry::captionPosition(NodeId const nodeId) const
 {
+    // 获取节点的大小信息，用于计算标题位置
     QSize size = _graphModel.nodeData<QSize>(nodeId, NodeRole::Size);
 
+    // 计算端口标题的高度，用于在节点顶部为端口标题留出空间
     unsigned int step = portCaptionsHeight(nodeId, PortType::In);
-    step += _portSpasing;
+    step += _portSpasing; // 加上端口间距，使布局更整齐
 
+    // 获取标题矩形，用于计算标题的宽度和高度
     auto rect = captionRect(nodeId);
 
+    // 返回标题的位置，将标题水平居中，垂直位置基于端口标题高度和标题矩形的高度
     return QPointF(0.5 * (size.width() - rect.width()), step + rect.height());
+
 }
 
 QPointF DefaultVerticalNodeGeometry::widgetPosition(NodeId const nodeId) const

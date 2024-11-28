@@ -22,7 +22,7 @@ static std::shared_ptr<NodeDelegateModelRegistry> registerDataModels()
     ret->registerModel<ImageShowModel>();
 
     ret->registerModel<ImageLoaderModel>();
-
+    
     return ret;
 }
 

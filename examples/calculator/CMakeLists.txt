@@ -22,8 +22,6 @@ add_executable(calculator
 
 target_link_libraries(calculator QtNodes)
 
-
-
 set(HEADLESS_CALC_SOURCE_FILES
   headless_main.cpp
   MathOperationDataModel.cpp
@@ -37,3 +35,7 @@ add_executable(headless_calculator
 )
 
 target_link_libraries(headless_calculator QtNodes)
+
+# -安装
+# 安装库文件到 lib 目录
+install(TARGETS calculator DESTINATION bin)

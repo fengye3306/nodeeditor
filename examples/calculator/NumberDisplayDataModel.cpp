@@ -56,7 +56,7 @@ QWidget *NumberDisplayDataModel::embeddedWidget()
 {
     if (!_label) {
         _label = new QLabel();
-        _label->setMargin(3);
+        _label->setMargin(6);
     }
 
     return _label;

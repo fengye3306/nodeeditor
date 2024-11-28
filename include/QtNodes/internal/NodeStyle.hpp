@@ -46,6 +46,9 @@ public:
     float PenWidth;
     float HoveredPenWidth;
 
+    float FontSize_Node_Title;
+    float FontSize_Node_LinkCirMsg;
+
     float ConnectionPointDiameter;
 
     float Opacity;
