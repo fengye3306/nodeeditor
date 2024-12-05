@@ -12,10 +12,9 @@ namespace QtNodes {
 class BasicGraphicsScene;
 class AbstractGraphModel;
 
-/**
- * @class NodeGraphicsObject
+/** 
+ * @class NodeGraphicsObject 
  * @brief 代表场景中的一个图形对象，与图形模型中的节点相关联。
- * 
  * 这个类管理一个节点在场景中的视觉表示，处理事件（如鼠标和悬停事件），
  * 并与底层图形模型进行交互。
  */
@@ -72,13 +71,13 @@ public:
     NodeId nodeId() const { return _nodeId; }
 
     /**
-     * @brief 获取节点状态的引用。
+     * @brief  获取节点状态的引用。
      * @return 返回此节点的状态的引用。
      */
     NodeState &nodeState() { return _nodeState; }
 
     /**
-     * @brief 获取节点状态的常量引用。
+     * @brief  获取节点状态的常量引用。
      * @return 返回此节点的状态的常量引用。
      */
     NodeState const &nodeState() const { return _nodeState; }
@@ -113,9 +112,7 @@ protected:
      * @param option 绘制选项。
      * @param widget 可选的部件，通常为空。
      */
-    void paint(QPainter *painter,
-               QStyleOptionGraphicsItem const *option,
-               QWidget *widget = 0) override;
+    void paint(QPainter *painter, QStyleOptionGraphicsItem const *option, QWidget *widget = 0) override;
 
     /**
      * @brief        处理项改变事件。
@@ -184,9 +181,9 @@ private:
     void setLockedState();
 
 private:
-    NodeId _nodeId; ///< 节点的唯一标识符。
-    AbstractGraphModel &_graphModel; ///< 引用图形模型。
-    NodeState _nodeState; ///< 节点的状态。
+    NodeId _nodeId;                   ///< 节点的唯一标识符。
+    AbstractGraphModel &_graphModel;  ///< 引用图形模型。
+    NodeState _nodeState;             ///< 节点的状态。
     
     /// 要么是 nullptr，要么由父类 QGraphicsItem 所拥有
     QGraphicsProxyWidget *_proxyWidget; 

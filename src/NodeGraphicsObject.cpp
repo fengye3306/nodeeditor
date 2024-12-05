@@ -175,11 +175,11 @@ void NodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
         // 创建自定义的菜单项
         QAction *action1 = contextMenu.addAction("详细视图");
-
+        
         // 连接菜单项的信号到槽函数
         connect(action1, &QAction::triggered, this, [this]() {
             // 自定义选项1的操作
-            qDebug() << "自定义选项 1 被选择";
+            // qDebug() << "自定义选项 1 被选择";
         });
 
         // 显示菜单
