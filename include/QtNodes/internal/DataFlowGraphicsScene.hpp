@@ -27,8 +27,17 @@ public:
 
 public Q_SLOTS:
     bool save() const;
-
     bool load();
+
+    QJsonObject save_GetJson() const{
+        QJsonObject  jsonObject =  _graphModel.save();
+        return jsonObject;
+    }
+    void load_SetJson(QJsonObject const &json) {
+        clearScene();
+        _graphModel.load(json);
+        Q_EMIT sceneLoaded();
+    }
 
 Q_SIGNALS:
     void sceneLoaded();

@@ -208,7 +208,10 @@ the moment of writing this documentation.
 
       "ConnectionPointDiameter": 8.0,
 
-      "Opacity": 0.8
+      "Opacity": 0.8,
+
+      "FontSize_Node_Title": 12,
+      "FontSize_Node_LinkCirMsg": 14  
     }
   }
 

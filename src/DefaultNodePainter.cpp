@@ -130,17 +130,14 @@ void DefaultNodePainter::drawConnectionPoints(QPainter *painter, NodeGraphicsObj
                     }
                 }
             }
-
             if (connectionStyle.useDataDefinedColors()) {
                 painter->setBrush(connectionStyle.normalColor(dataType.id));
             } else {
                 painter->setBrush(nodeStyle.ConnectionPointColor);
             }
-
             painter->drawEllipse(p, reducedDiameter * r, reducedDiameter * r);
         }
     }
-
     if (ngo.nodeState().connectionForReaction()) {
         ngo.nodeState().resetConnectionForReaction();
     }
@@ -211,8 +208,15 @@ void DefaultNodePainter::drawNodeCaption(QPainter *painter, NodeGraphicsObject &
 
     painter->setFont(f);
     painter->setPen(nodeStyle.FontColor);
-    painter->drawText(position, name);
 
+    QFont originalFont = painter->font();
+    f.setPointSize(nodeStyle.FontSize_Node_Title); 
+    f.setBold(false);  
+
+    painter->drawText(position, name);
+    
+    painter->setFont(originalFont);
+    
     f.setBold(false);
     painter->setFont(f);
 }
@@ -251,8 +255,14 @@ void DefaultNodePainter::drawEntryLabels(QPainter *painter, NodeGraphicsObject &
 
                 s = portData.value<NodeDataType>().name;
             }
-
+            QFont originalFont = painter->font();
+            QFont newFont = originalFont;
+            newFont.setPointSize(nodeStyle.FontSize_Node_LinkCirMsg); 
+      
+            painter->setFont(newFont);
             painter->drawText(p, s);
+
+            painter->setFont(originalFont);
         }
     }
 }

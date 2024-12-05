@@ -28,7 +28,7 @@ NodeGraphicsObject::NodeGraphicsObject(BasicGraphicsScene &scene, NodeId nodeId)
 
     setFlag(QGraphicsItem::ItemDoesntPropagateOpacityToChildren, true);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
-
+    
     setLockedState();
 
     setCacheMode(QGraphicsItem::DeviceCoordinateCache);
@@ -168,9 +168,27 @@ QVariant NodeGraphicsObject::itemChange(GraphicsItemChange change, const QVarian
 
 void NodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    //if (_nodeState.locked())
-    //return;
+    // 检查是否是右键点击
+    if (event->button() == Qt::RightButton) {
+        // 创建一个自定义菜单
+        QMenu contextMenu;
 
+        // 创建自定义的菜单项
+        QAction *action1 = contextMenu.addAction("详细视图");
+
+        // 连接菜单项的信号到槽函数
+        connect(action1, &QAction::triggered, this, [this]() {
+            // 自定义选项1的操作
+            qDebug() << "自定义选项 1 被选择";
+        });
+
+        // 显示菜单
+        contextMenu.exec(event->screenPos());  // 在鼠标位置显示菜单
+    }
+
+    // 如果是左键点击 则
+    else if (event->button() == Qt::LeftButton) {
+    
     AbstractNodeGeometry &geometry = nodeScene()->nodeGeometry();
 
     for (PortType portToCheck : {PortType::In, PortType::Out}) {
@@ -212,9 +230,8 @@ void NodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
                 }
             } // if port == out
 
-            ConnectionId const incompleteConnectionId = makeIncompleteConnectionId(_nodeId,
-                                                                                   portToCheck,
-                                                                                   portIndex);
+            ConnectionId const incompleteConnectionId 
+                = makeIncompleteConnectionId(_nodeId, portToCheck, portIndex);
 
             nodeScene()->makeDraftConnection(incompleteConnectionId);
         }
@@ -230,6 +247,7 @@ void NodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     if (isSelected()) {
         Q_EMIT nodeScene()->nodeSelected(_nodeId);
+    }
     }
 }
 
