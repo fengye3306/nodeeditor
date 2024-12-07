@@ -171,7 +171,7 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
     auto const scenePos = mapToScene(event->pos());
 
     QMenu *menu = nodeScene()->createSceneMenu(scenePos);
-
+    
     if (menu) {
         menu->exec(event->globalPos());
     }

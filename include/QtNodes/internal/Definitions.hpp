@@ -32,6 +32,7 @@ Q_NAMESPACE_EXPORT(NODE_EDITOR_PUBLIC)
         InPortCount = 7,    ///< `unsigned int`
         OutPortCount = 9,   ///< `unsigned int`
         Widget = 10,        ///< Optional `QWidget*` or `nullptr`
+        Widget_detailedSettings  = 11/// 详细配置窗口
     };
 Q_ENUM_NS(NodeRole)
 

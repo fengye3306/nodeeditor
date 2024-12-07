@@ -15,12 +15,10 @@
 namespace QtNodes {
 
 /**
- * The central class in the Model-View approach. It delivers all kinds
- * of information from the backing user data structures that represent
- * the graph. The class allows to modify the graph structure: create
- * and remove nodes and connections.
+ * 模型-视图方法中的核心类。它从代表图的用户数据结构中提供各种信息。
+ * 该类允许修改图结构：创建和移除节点和连接。
  *
- * We use two types of the unique ids for graph manipulations:
+ * 我们使用两种类型的唯一标识符进行图操作：
  *   - NodeId
  *   - ConnectionId
  */
@@ -28,83 +26,40 @@ class NODE_EDITOR_PUBLIC AbstractGraphModel : public QObject
 {
     Q_OBJECT
 public:
-    /// Generates a new unique NodeId.
+    /// 生成一个新的唯一 NodeId。
     virtual NodeId newNodeId() = 0;
 
-    /// @brief Returns the full set of unique Node Ids.
-    /**
-   * Model creator is responsible for generating unique `unsigned int`
-   * Ids for all the nodes in the graph. From an Id it should be
-   * possible to trace back to the model's internal representation of
-   * the node.
-   */
+    /// 返回所有唯一 Node Ids 的完整集合。
     virtual std::unordered_set<NodeId> allNodeIds() const = 0;
 
-    /**
-   * A collection of all input and output connections for the given `nodeId`.
-   */
+    /// 返回给定 nodeId 的所有输入和输出连接的集合。
     virtual std::unordered_set<ConnectionId> allConnectionIds(NodeId const nodeId) const = 0;
 
-    /// @brief Returns all connected Node Ids for given port.
-    /**
-   * The returned set of nodes and port indices correspond to the type
-   * opposite to the given `portType`.
-   */
-    virtual std::unordered_set<ConnectionId> connections(NodeId nodeId,
-                                                         PortType portType,
-                                                         PortIndex index) const
-        = 0;
+    /// 返回给定端口的所有已连接 Node Ids。
+    virtual std::unordered_set<ConnectionId> connections(NodeId nodeId, PortType portType, PortIndex index) const = 0;
 
-    /// Checks if two nodes with the given `connectionId` are connected.
+    /// 检查两个给定 connectionId 的节点是否已连接。
     virtual bool connectionExists(ConnectionId const connectionId) const = 0;
 
-    /// Creates a new node instance in the derived class.
-    /**
-   * The model is responsible for generating a unique `NodeId`.
-   * @param[in] nodeType is free to be used and interpreted by the
-   * model on its own, it helps to distinguish between possible node
-   * types and create a correct instance inside.
-   */
+    /// 在派生类中创建一个新的节点实例。
     virtual NodeId addNode(QString const nodeType = QString()) = 0;
 
-    /// Model decides if a conection with a given connection Id possible.
-    /**
-   * The default implementation compares corresponding data types.
-   *
-   * It is possible to override the function and connect non-equal
-   * data types.
-   */
+    /// 模型决定给定连接Id的连接是否可能。
     virtual bool connectionPossible(ConnectionId const connectionId) const = 0;
 
-    /// Defines if detaching the connection is possible.
+    /// 定义是否可以分离连接。
     virtual bool detachPossible(ConnectionId const) const { return true; }
 
-    /// Creates a new connection between two nodes.
-    /**
-   * Default implementation emits signal
-   * `connectionCreated(connectionId)`
-   *
-   * In the derived classes user must emite the signal to notify the
-   * scene about the changes.
-   */
+    /// 在两个节点之间创建一个新的连接。
     virtual void addConnection(ConnectionId const connectionId) = 0;
 
-    /**
-   * @returns `true` if there is data in the model associated with the
-   * given `nodeId`.
-   */
+    /// 如果模型中存在与给定 nodeId 关联的数据，则返回 `true`。
     virtual bool nodeExists(NodeId const nodeId) const = 0;
 
-    /// @brief Returns node-related data for requested NodeRole.
-    /**
-   * @returns Node Caption, Node Caption Visibility, Node Position etc.
-   */
+    /// 返回请求 NodeRole 的节点相关数据。
     virtual QVariant nodeData(NodeId nodeId, NodeRole role) const = 0;
 
-    /**
-   * A utility function that unwraps the `QVariant` value returned from the
-   * standard `QVariant AbstractGraphModel::nodeData(NodeId, NodeRole)` function.
-   */
+    /// 一个实用函数，它解包从标准 `QVariant AbstractGraphModel::nodeData(NodeId, NodeRole)` 函数返回的 `QVariant` 值。
     template<typename T>
     T nodeData(NodeId nodeId, NodeRole role) const
     {
@@ -117,26 +72,13 @@ public:
         return NodeFlag::NoFlags;
     }
 
-    /// @brief Sets node properties.
-    /**
-   * Sets: Node Caption, Node Caption Visibility,
-   * Shyle, State, Node Position etc.
-   * @see NodeRole.
-   */
+    /// 设置节点属性。
     virtual bool setNodeData(NodeId nodeId, NodeRole role, QVariant value) = 0;
 
-    /// @brief Returns port-related data for requested NodeRole.
-    /**
-   * @returns Port Data Type, Port Data, Connection Policy, Port
-   * Caption.
-   */
-    virtual QVariant portData(NodeId nodeId, PortType portType, PortIndex index, PortRole role) const
-        = 0;
+    /// 返回请求 NodeRole 的端口相关数据。
+    virtual QVariant portData(NodeId nodeId, PortType portType, PortIndex index, PortRole role) const = 0;
 
-    /**
-   * A utility function that unwraps the `QVariant` value returned from the
-   * standard `QVariant AbstractGraphModel::portData(...)` function.
-   */
+    /// 一个实用函数，它解包从标准 `QVariant AbstractGraphModel::portData(...)` 函数返回的 `QVariant` 值。
     template<typename T>
     T portData(NodeId nodeId, PortType portType, PortIndex index, PortRole role) const
     {
@@ -155,91 +97,75 @@ public:
     virtual bool deleteNode(NodeId const nodeId) = 0;
 
     /**
-   * Reimplement the function if you want to store/restore the node's
-   * inner state during undo/redo node deletion operations.
+   * 如果你想在撤销/重做节点删除操作期间保存/恢复节点的内部状态，请重写此函数。
    */
     virtual QJsonObject saveNode(NodeId const) const { return {}; }
 
     /**
-   * Reimplement the function if you want to support:
+   * 如果你想支持以下操作，请重写此函数：
    *
-   *   - graph save/restore operations,
-   *   - undo/redo operations after deleting the node.
+   *   - 图的保存/恢复操作，
+   *   - 删除节点后的撤销/重做操作。
    *
-   * QJsonObject must contain following fields:
-   *
+   * QJsonObject 必须包含以下字段：
    *
    * ```
    * {
    *   id : 5,
    *   position : { x : 100, y : 200 },
    *   internal-data {
-   *     "your model specific data here"
+   *     "您的模型特定数据在这里"
    *   }
    * }
    * ```
    *
-   * The function must do almost exacly the same thing as the normal addNode().
-   * The main difference is in a model-specific `inner-data` processing.
+   * 该函数必须几乎与正常的 addNode() 做相同的事情。主要区别在于模型特定的 `inner-data` 处理。
    */
     virtual void loadNode(QJsonObject const &) {}
 
 public:
-    /**
-   * Function clears connections attached to the ports that are scheduled to be
-   * deleted. It must be called right before the model removes its old port data.
-   *
-   * @param nodeId Defines the node to be modified
-   * @param portType Is either PortType::In or PortType::Out
-   * @param first Index of the first port to be removed
-   * @param last Index of the last port to be removed
-   */
+    /// 删除端口前清除连接到即将删除的端口的连接。在模型删除其旧的端口数据之前，必须调用此函数。
     void portsAboutToBeDeleted(NodeId const nodeId,
                                PortType const portType,
                                PortIndex const first,
                                PortIndex const last);
 
-    /**
-   * Signal emitted when model no longer has the old data associated with the
-   * given port indices and when the node must be repainted.
-   */
+    /// 当模型不再有与给定端口索引关联的旧数据，并且节点必须重新绘制时，发出此信号。
     void portsDeleted();
 
-    /**
-   * Signal emitted when model is about to create new ports on the given node.
-   * @param first Is the first index of the new port after insertion.
-   * @param last Is the last index of the new port after insertion.
-   *
-   * Function caches existing connections that are located after the `last` port
-   * index. For such connections the new "post-insertion" addresses are computed
-   * and stored until the function AbstractGraphModel::portsInserted is called.
-   */
+    /// 当模型即将在给定节点上创建新端口时，发出此信号。 first 是插入后新端口的第一个索引，last 是插入后新端口的最后一个索引。
     void portsAboutToBeInserted(NodeId const nodeId,
                                 PortType const portType,
                                 PortIndex const first,
                                 PortIndex const last);
 
-    /**
-   * Function re-creates the connections that were shifted during the port
-   * insertion. After that the node is updated.
-   */
+    /// 重新创建在端口插入期间移动的连接。之后更新节点。
     void portsInserted();
 
 Q_SIGNALS:
+
+    // 当新的连接被创建时发出此信号。
     void connectionCreated(ConnectionId const connectionId);
 
+    // 当一个连接被删除时发出此信号。
     void connectionDeleted(ConnectionId const connectionId);
 
+    // 当一个新节点被创建时发出此信号。
     void nodeCreated(NodeId const nodeId);
 
+    // 当一个节点被删除时发出此信号。
     void nodeDeleted(NodeId const nodeId);
 
+    // 当一个节点的数据更新时发出此信号。
     void nodeUpdated(NodeId const nodeId);
 
+    // 当一个节点的标志状态更新时发出此信号。
     void nodeFlagsUpdated(NodeId const nodeId);
 
+    // 当一个节点的位置更新时发出此信号。
     void nodePositionUpdated(NodeId const nodeId);
 
+    // 当模型重置时发出此信号。
     void modelReset();
 
 private:

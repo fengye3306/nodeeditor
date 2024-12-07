@@ -46,26 +46,26 @@ public:
     GraphicsView operator=(const GraphicsView &) = delete;
 
     /**
-     * @brief 获取清除选中项的操作。
-     * @return 返回对应的 QAction。
+     * @brief 获取清除选中项的操作
+     * @return 返回对应的 QAction
      */
     QAction *clearSelectionAction() const;
 
     /**
-     * @brief 获取删除选中项的操作。
-     * @return 返回对应的 QAction。
+     * @brief 获取删除选中项的操作
+     * @return 返回对应的 QAction
      */
     QAction *deleteSelectionAction() const;
 
     /**
-     * @brief 设置视图的场景。
-     * @param scene 需要设置的场景对象。
+     * @brief 设置视图的场景
+     * @param scene 需要设置的场景对象
      */
     void setScene(BasicGraphicsScene *scene);
 
     /**
-     * @brief 居中视图中的场景。
-     * 将视图中的场景内容居中显示。
+     * @brief 居中视图中的场景
+     * 将视图中的场景内容居中显示
      */
     void centerScene();
 

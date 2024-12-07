@@ -113,9 +113,6 @@ void NodeStyle::loadJson(QJsonObject const &json)
     NODE_STYLE_READ_FLOAT(obj, ConnectionPointDiameter);
 
     NODE_STYLE_READ_FLOAT(obj, Opacity);
-
-    NODE_STYLE_READ_FLOAT(obj, FontSize_Node_Title);
-    NODE_STYLE_READ_FLOAT(obj, FontSize_Node_LinkCirMsg);
 }
 
 QJsonObject NodeStyle::toJson() const
@@ -141,9 +138,6 @@ QJsonObject NodeStyle::toJson() const
     NODE_STYLE_WRITE_FLOAT(obj, ConnectionPointDiameter);
 
     NODE_STYLE_WRITE_FLOAT(obj, Opacity);
-
-    NODE_STYLE_WRITE_FLOAT(obj, FontSize_Node_Title);
-    NODE_STYLE_WRITE_FLOAT(obj, FontSize_Node_LinkCirMsg);
 
     QJsonObject root;
     root["NodeStyle"] = obj;

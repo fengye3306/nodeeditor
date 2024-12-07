@@ -235,7 +235,15 @@ QVariant DataFlowGraphModel::nodeData(NodeId nodeId, NodeRole role) const
     case NodeRole::Widget: {
         auto w = model->embeddedWidget();
         result = QVariant::fromValue(w);
-    } break;
+        break;
+    } 
+
+    case NodeRole::Widget_detailedSettings: {
+        auto w = model->detailedSettingsWidget();
+        result = QVariant::fromValue(w);
+        break;
+    }
+
     }
 
     return result;

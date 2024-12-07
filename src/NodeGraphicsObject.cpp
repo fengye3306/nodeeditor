@@ -178,10 +178,13 @@ void NodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
         
         // 连接菜单项的信号到槽函数
         connect(action1, &QAction::triggered, this, [this]() {
-            // 自定义选项1的操作
-            // qDebug() << "自定义选项 1 被选择";
-        });
 
+            if (auto w_detailedSettings 
+                = _graphModel.nodeData(_nodeId, NodeRole::Widget_detailedSettings).value<QWidget *>()) {
+                // 展示
+                w_detailedSettings->show();
+            }
+        });
         // 显示菜单
         contextMenu.exec(event->screenPos());  // 在鼠标位置显示菜单
     }

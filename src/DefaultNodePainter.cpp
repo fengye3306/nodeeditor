@@ -1,8 +1,8 @@
-#include "DefaultNodePainter.hpp"
 
 #include <cmath>
-
 #include <QtCore/QMargins>
+
+#include "DefaultNodePainter.hpp"
 
 #include "AbstractGraphModel.hpp"
 #include "AbstractNodeGeometry.hpp"
@@ -198,25 +198,19 @@ void DefaultNodePainter::drawNodeCaption(QPainter *painter, NodeGraphicsObject &
 
     QString const name = model.nodeData(nodeId, NodeRole::Caption).toString();
 
-    QFont f = painter->font();
-    f.setBold(true);
+    QFont f = painter->font(); 
+    f.setBold(true); 
 
-    QPointF position = geometry.captionPosition(nodeId);
+    QPointF position = geometry.captionPosition(nodeId); 
 
     QJsonDocument json = QJsonDocument::fromVariant(model.nodeData(nodeId, NodeRole::Style));
-    NodeStyle nodeStyle(json.object());
+    NodeStyle nodeStyle(json.object()); 
 
-    painter->setFont(f);
-    painter->setPen(nodeStyle.FontColor);
+    painter->setFont(f); 
+    painter->setPen(nodeStyle.FontColor); 
 
-    QFont originalFont = painter->font();
-    f.setPointSize(nodeStyle.FontSize_Node_Title); 
-    f.setBold(false);  
+    painter->drawText(position, name); 
 
-    painter->drawText(position, name);
-    
-    painter->setFont(originalFont);
-    
     f.setBold(false);
     painter->setFont(f);
 }
@@ -231,8 +225,7 @@ void DefaultNodePainter::drawEntryLabels(QPainter *painter, NodeGraphicsObject &
     NodeStyle nodeStyle(json.object());
 
     for (PortType portType : {PortType::Out, PortType::In}) {
-        unsigned int n = model.nodeData<unsigned int>(nodeId,
-                                                      (portType == PortType::Out)
+        unsigned int n = model.nodeData<unsigned int>(nodeId, (portType == PortType::Out)
                                                           ? NodeRole::OutPortCount
                                                           : NodeRole::InPortCount);
 
@@ -252,17 +245,10 @@ void DefaultNodePainter::drawEntryLabels(QPainter *painter, NodeGraphicsObject &
                 s = model.portData<QString>(nodeId, portType, portIndex, PortRole::Caption);
             } else {
                 auto portData = model.portData(nodeId, portType, portIndex, PortRole::DataType);
-
                 s = portData.value<NodeDataType>().name;
             }
-            QFont originalFont = painter->font();
-            QFont newFont = originalFont;
-            newFont.setPointSize(nodeStyle.FontSize_Node_LinkCirMsg); 
-      
-            painter->setFont(newFont);
-            painter->drawText(p, s);
 
-            painter->setFont(originalFont);
+            painter->drawText(p, s);
         }
     }
 }
@@ -275,7 +261,6 @@ void DefaultNodePainter::drawResizeRect(QPainter *painter, NodeGraphicsObject &n
 
     if (model.nodeFlags(nodeId) & NodeFlag::Resizable) {
         painter->setBrush(Qt::gray);
-
         painter->drawEllipse(geometry.resizeHandleRect(nodeId));
     }
 }

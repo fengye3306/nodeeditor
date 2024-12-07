@@ -49,8 +49,5 @@ public:
     float ConnectionPointDiameter;
 
     float Opacity;
-
-    float FontSize_Node_Title;
-    float FontSize_Node_LinkCirMsg;
 };
 } // namespace QtNodes

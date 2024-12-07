@@ -118,9 +118,14 @@ public:
    */
     virtual QWidget *embeddedWidget() = 0;
 
+    // 用于展示详细配置界面
+    virtual QWidget *detailedSettingsWidget() = 0;
+
+
     /// @brief 判断控件是否可调整大小
     /// @return 
     virtual bool resizable() const { return false; }
+
 
 public Q_SLOTS:
     
