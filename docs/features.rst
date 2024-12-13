@@ -290,6 +290,10 @@ as follows:
   {
     portsAboutToBeInserted(nodeId, PortType::Out, 1, 2);
 
+
+    // 在这里进行你的底层数据修改
+    // 上面的函数调用已经为新的输出端口做好了准备，这些端口的索引是1和2。
+    // 所有在新端口2以下的现有连接都将被删除并重新插入，其ID将偏移2位。
     //   DO YOUR UNDERLYING DATA MODIFICATIONS HERE
     //   The function call above has prepared the insertion of new output ports
     //   with the indexes 1 and 2.
@@ -304,6 +308,9 @@ Code Example
   For the usage see ``examples/dynamic_ports``.
 
 
+
+
+冻结节点
 Locked Nodes and Connections
 ----------------------------
 
@@ -329,7 +336,9 @@ model:
   }
 
 
-
+禁用连接分离（Disabled Connection Detaching）
+在某些情况下，您可能希望用户无法断开节点之间的连接，
+例如为了保持数据流的完整性或防止误操作。这种功能可以通过设置特定标志或覆盖相关行为来实现。
 Disabled Connection Detaching
 -----------------------------
 
@@ -344,16 +353,29 @@ Code Example
 
 
 Data Propagation
+数据传播（Data Propagation）
 ----------------
 
+数据传播类为基础的 AbstractGraphModel 添加了额外的功能，
+使它们能够在创建连接时将数据从一个节点推送到另一个节点。
 Data-propagating classes add extra funtionality to the basic
 ``AbstractGraphModel`` which allows them to push the data from node to node upon
 creating a connection.
 
+
+数据传播的流程从 NodeDelegateModel 实例开始。它会通过一个 Qt 信号 dataUpdated(PortIndex) 触发数据更新。
+我们假设数据总是从右侧的输出端口（PortType::Out）发出。
 The chain starts from the instance of a ``NodeDelegateModel``. It emits a Qt
 signal ``dataUpdated(PortIndex)``. We always assume that the data is emitted from
 one of the right hand side ports (``PortType::Out``).
 
+
+然后，函数 DataFlowGraphModel::onOutPortDataUpdated(NodeId, PortIndex) 开始发挥作用。
+该函数从输出端口读取数据，收集与指定 PortIndex 相关联的所有连接，
+并通过 DataFlowGraphModel::setPortData 将数据设置到已连接的节点。
+在通过 NodeDelegateModel::setInData(...) 将数据设置到目标节点的输入代理模型后，
+我们会发出信号 inPortDataWasSet(nodeId, portType, portIndex)。
+该信号用于重新绘制接收数据的节点，同时也可以供用户自定义用途进行挂接（例如触发其他功能）。
 Then the function ``DataFlowGraphModel::onOutPortDataUpdated(NodeId, PortIndex)``
 comes into play. It reads the data from the output port, collects all the
 attached connections for the given ``PortIndex`` and sets the data to the
@@ -364,18 +386,19 @@ redraw the receiver node and could be hooked up for other user's purposes.
 
 ::
 
-  NodeDelegateModel:::dataUpdated(PortIndex)
+NodeDelegateModel::dataUpdated(PortIndex)
 
-  // Source Delegate Model -> source NodeId
-  DataFlowGraphModel::onOutPortDataUpdated(NodeId, PortIndex)
+// 从源节点的 Delegate Model 发出更新信号 -> 源节点的 NodeId
+DataFlowGraphModel::onOutPortDataUpdated(NodeId, PortIndex)
 
-  // soure NodeId -> target NodeId
-  DataFlowGraphModel::setPortData()
+// 从源节点流向目标节点 -> 调用 setPortData
+DataFlowGraphModel::setPortData()
 
-  // target NodeId -> target Delegate Model
-  NodeDelegateModel::setInData(NodeData, portIndex)
+// 在目标节点的 Delegate Model 中接收数据并更新
+NodeDelegateModel::setInData(NodeData, portIndex)
 
-  DataFlowGraphModel::setPortData()
+// 通知数据更新并重新绘制目标节点
+DataFlowGraphModel::setPortData()
 
 
 Headless Mode

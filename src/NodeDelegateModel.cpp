@@ -21,7 +21,7 @@ QJsonObject NodeDelegateModel::save() const
 
 void NodeDelegateModel::load(QJsonObject const &)
 {
-    //
+    // 
 }
 
 ConnectionPolicy NodeDelegateModel::portConnectionPolicy(PortType portType, PortIndex) const
@@ -37,7 +37,6 @@ ConnectionPolicy NodeDelegateModel::portConnectionPolicy(PortType portType, Port
     case PortType::None:
         break;
     }
-
     return result;
 }
 

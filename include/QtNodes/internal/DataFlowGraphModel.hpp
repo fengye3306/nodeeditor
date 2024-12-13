@@ -36,7 +36,6 @@ public:
 
     // 获取数据模型注册表。
     std::shared_ptr<NodeDelegateModelRegistry> dataModelRegistry() { return _registry; }
-
 public:
     // 覆盖的方法，返回所有节点的ID。
     std::unordered_set<NodeId> allNodeIds() const override;
@@ -48,7 +47,7 @@ public:
     std::unordered_set<ConnectionId> connections(NodeId nodeId,
                                                  PortType portType,
                                                  PortIndex portIndex) const override;
-
+                                                 
     // 检查指定的连接是否存在。
     bool connectionExists(ConnectionId const connectionId) const override;
 
@@ -58,7 +57,7 @@ public:
     // 检查是否可以创建连接。
     bool connectionPossible(ConnectionId const connectionId) const override;
 
-    // 添加一个新的连接。
+    // 添加一个新的链接
     void addConnection(ConnectionId const connectionId) override;
 
     // 检查节点是否存在。

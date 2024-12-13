@@ -134,16 +134,18 @@ void DataFlowGraphModel::addConnection(ConnectionId const connectionId)
 
     sendConnectionCreation(connectionId);
 
-    QVariant const portDataToPropagate = portData(connectionId.outNodeId,
-                                                  PortType::Out,
-                                                  connectionId.outPortIndex,
-                                                  PortRole::Data);
+    // 移除 使得当 链接时不再更新节点
+    // QVariant const portDataToPropagate = portData(connectionId.outNodeId,
+    //                                               PortType::Out,
+    //                                               connectionId.outPortIndex,
+    //                                               PortRole::Data);
 
-    setPortData(connectionId.inNodeId,
-                PortType::In,
-                connectionId.inPortIndex,
-                portDataToPropagate,
-                PortRole::Data);
+    // 阻止了 当链接时直接触发 执行
+    // setPortData(connectionId.inNodeId,
+    //             PortType::In,
+    //             connectionId.inPortIndex,
+    //             portDataToPropagate,
+    //             PortRole::Data);
 }
 
 void DataFlowGraphModel::sendConnectionCreation(ConnectionId const connectionId)

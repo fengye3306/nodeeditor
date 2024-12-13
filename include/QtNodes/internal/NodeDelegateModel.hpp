@@ -62,6 +62,7 @@ public:
     void load(QJsonObject const &) override;
 
 public:
+
     /// @brief  获取指定端口类型的端口数量（如输入端口或输出端口）
     /// @param portType 
     /// @return 
@@ -74,7 +75,6 @@ public:
     virtual NodeDataType dataType(PortType portType, PortIndex portIndex) const = 0;
 
 public:
-
     /// @brief 获取端口的连接策略（决定该端口是否允许多个连接）
     /// @param  
     /// @param  
@@ -151,23 +151,22 @@ Q_SIGNALS:
     /// 当数据无效时，触发此信号，传播空数据到下游
     void dataInvalidated(PortIndex const index);
 
-
     /// @brief  计算开始时触发此信号
     void computingStarted();
-
+    
     /// @brief 计算结束时触发此信号
     void computingFinished();
 
     /// @brief 当嵌入式控件大小更新时触发此信号
     void embeddedWidgetSizeUpdated();
-
+    
     /// Call this function before deleting the data associated with ports.
-    /**
+    /** 
    * The function notifies the Graph Model and makes it remove and recompute the
    * affected connection addresses.
-   * 
+   *  
    * 在删除与端口相关的数据之前调用此函数，通知图形模型移除并重新计算受影响的连接地址
-   */
+   */ 
     void portsAboutToBeDeleted(PortType const portType, PortIndex const first, PortIndex const last);
 
     /// Call this function when data and port moditications are finished.
@@ -175,7 +174,7 @@ Q_SIGNALS:
     void portsDeleted();
 
     /// Call this function before inserting the data associated with ports.
-    /**
+/**
    * The function notifies the Graph Model and makes it recompute the affected
    * connection addresses.
    * 在插入与端口相关的数据之前调用此函数，通知图形模型重新计算受影响的连接地址
