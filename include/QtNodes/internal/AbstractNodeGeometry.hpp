@@ -21,7 +21,7 @@ public:
      * 返回节点的大小以及其周围的额外边距，用于考虑绘制效果
      *（例如阴影）或节点的某些部分超出大小矩形的部分
      *（例如端口点）。
-     *
+     * 
      * 默认实现返回 QSize，并在矩形的每一侧增加 20% 的宽度和高度。
      */
     virtual QRectF boundingRect(NodeId const nodeId) const;

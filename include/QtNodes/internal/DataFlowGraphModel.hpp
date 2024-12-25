@@ -5,7 +5,6 @@
 #include "NodeDelegateModelRegistry.hpp"
 #include "Serializable.hpp"
 #include "StyleCollection.hpp"
-
 #include "Export.hpp"
 
 #include <QJsonObject>
@@ -15,13 +14,10 @@
 
 namespace QtNodes {
 
-/**
- * 数据流图模型，扩展自抽象图模型，并实现了可序列化接口。
- */
+/** @brief 节点管理器 */
 class NODE_EDITOR_PUBLIC DataFlowGraphModel : public AbstractGraphModel, public Serializable
 {
     Q_OBJECT
-
 public:
     // 节点几何数据结构，包括尺寸和位置。
     struct NodeGeometryData
@@ -29,135 +25,186 @@ public:
         QSize size;
         QPointF pos;
     };
-
 public:
-    // 构造函数，接受一个节点代理模型注册表的共享指针。
+    
+    /**
+     * @brief 构造函数
+     * 
+     * @param registry 节点构造器注册表
+     */
     DataFlowGraphModel(std::shared_ptr<NodeDelegateModelRegistry> registry);
-
-    // 获取数据模型注册表。
+    
+    /**
+     * @brief 获取节点构造器注册表
+     * 
+     * @return std::shared_ptr<NodeDelegateModelRegistry> 
+     */
     std::shared_ptr<NodeDelegateModelRegistry> dataModelRegistry() { return _registry; }
 public:
-    // 覆盖的方法，返回所有节点的ID。
+    
+    /**
+     * @brief 获取节点集合，存放于 std::unordered_set<NodeId> 中
+     * 
+     * @return std::unordered_set<NodeId> 节点集合
+     */
     std::unordered_set<NodeId> allNodeIds() const override;
 
-    // 返回指定节点的所有连接ID。
-    std::unordered_set<ConnectionId> allConnectionIds(NodeId const nodeId) const override;
+    /**
+     * @brief 某ID节点，返回它所有的连接
+     * 
+     * @param nodeId 节点ID 
+     * @return std::unordered_set<ConnectionId> 
+     */
+    std::unordered_set<ConnectionId> allConnectionIds (NodeId const nodeId) const override;
 
-    // 返回指定节点的所有连接。
-    std::unordered_set<ConnectionId> connections(NodeId nodeId,
-                                                 PortType portType,
-                                                 PortIndex portIndex) const override;
+    /**
+     * @brief 某ID节点，返回它某端口下所有的连接
+     * 
+     * @param nodeId    节点ID
+     * @param portType  端口类型
+     * @param portIndex 端口索引
+     * @return std::unordered_set<ConnectionId> 
+     */
+    std::unordered_set<ConnectionId> connections (NodeId nodeId, PortType portType, PortIndex portIndex) const override;
                                                  
-    // 检查指定的连接是否存在。
+    /**
+     * @brief 某ID链接是否存在？
+     * 
+     * @param connectionId 链接ID
+     * @return true  存在
+     * @return false 不存在
+     */
     bool connectionExists(ConnectionId const connectionId) const override;
 
-    // 添加一个新节点。
+    /**
+     * @brief 添加新节点
+     *  例如 “乘法”，在注册表中查找到对应的构造器“乘法”，然后创建一个新的“乘法”节点
+     * @param nodeType 新节点 节点名 例如“乘法”
+     * @return NodeId  新建的节点ID
+     */
     NodeId addNode(QString const nodeType) override;
 
-    // 检查是否可以创建连接。
+    /**
+     * @brief 连接是否可能？
+     * 
+     * @param connectionId 链接ID
+     * @return true  可能
+     * @return false 不可能
+     */
     bool connectionPossible(ConnectionId const connectionId) const override;
 
-    // 添加一个新的链接
+    /** 添加一个链接 */
     void addConnection(ConnectionId const connectionId) override;
 
-    // 检查节点是否存在。
+    /** 某ID节点是否存在 */
     bool nodeExists(NodeId const nodeId) const override;
 
-    // 获取节点相关数据。
-    QVariant nodeData(NodeId nodeId, NodeRole role) const override;
-
-    // 获取节点标志。
+    /**
+     * @brief 获取节点标志
+     * 
+     * @param nodeId 节点ID
+     * @return NodeFlags 用于规定节点特性和外观的特定标志。
+     */
     NodeFlags nodeFlags(NodeId nodeId) const override;
 
-    // 设置节点数据。
+    /** 从节点中抽取数据 */
+    QVariant nodeData(NodeId nodeId, NodeRole role) const override;
+    /** 为节点配置数据 */
     bool setNodeData(NodeId nodeId, NodeRole role, QVariant value) override;
 
-    // 获取端口相关数据。
+    /** 获取节点 某端口 的数据 */
     QVariant portData(NodeId nodeId,
                       PortType portType,
                       PortIndex portIndex,
                       PortRole role) const override;
 
-    // 设置端口数据。
+    /** 设置节点 某端口 数据 */
     bool setPortData(NodeId nodeId,
                      PortType portType,
                      PortIndex portIndex,
                      QVariant const &value,
                      PortRole role = PortRole::Data) override;
 
-    // 删除连接。
+    /** 删除链接 */
     bool deleteConnection(ConnectionId const connectionId) override;
-
-    // 删除节点。
+    /** 删除节点 */
     bool deleteNode(NodeId const nodeId) override;
 
-    // 保存节点的状态。
+    // 单个节点序列化
     QJsonObject saveNode(NodeId const) const override;
-
-    // 保存整个模型的状态。
-    QJsonObject save() const override;
-
-    // 从JSON加载一个节点。
+    // 单个节点的反序列化
     void loadNode(QJsonObject const &nodeJson) override;
-
-    // 从JSON加载整个模型。
+    // save
+    QJsonObject save() const override;
+    // load
     void load(QJsonObject const &json) override;
 
     /**
-     * 获取给定 nodeId 的 NodeDelegateModel，并尝试将存储的指针转换为给定类型。
-     */
+      * 对于某节点， 构造其同类节点
+    */
     template<typename NodeDelegateModelType>
     NodeDelegateModelType *delegateModel(NodeId const nodeId)
     {
         auto it = _models.find(nodeId);
         if (it == _models.end())
+        {
             return nullptr;
-
+        }
         auto model = dynamic_cast<NodeDelegateModelType *>(it->second.get());
-
         return model;
     }
 
+    /** 添加节点 */
+    void addPort(NodeId nodeId, PortType portType, PortIndex portIndex);
+    /** 移除节点 */
+    void removePort(NodeId nodeId, PortType portType, PortIndex first);
+
+
 Q_SIGNALS:
-    // 当输入端口设置了数据时发出的信号。
+    // 节点数据已经更新， DataFlowGraphModel::setPortData 调用
     void inPortDataWasSet(NodeId const, PortType const, PortIndex const);
-
 private:
-    // 生成一个新的 NodeId。
+    // 生成一个新节点时，节点ID
     NodeId newNodeId() override { return _nextNodeId++; }
-
-    // 发送连接创建信号。
+    
+    /**
+     * @brief 链接产生时 触发
+     * AbstractGraphModel::connectionCreated
+     * 调用对应被链接节点的
+     * NodeDelegateModel::inputConnectionCreated
+     * 调用对应输出节点的
+     * NodeDelegateModel::outputConnectionCreated
+     * @param connectionId 
+     */
     void sendConnectionCreation(ConnectionId const connectionId);
 
-    // 发送连接删除信号。
-    void sendConnectionDeletion(ConnectionId const connectionId);
-
-private Q_SLOTS:
     /**
-   * 此函数在三种情况下被调用：
-   *
-   * - 当底层 NodeDelegateModel 有新数据传播时。
-   *   @see DataFlowGraphModel::addNode
-   * - 当创建了新连接时。
-   *   @see DataFlowGraphModel::addConnection
-   * - 当从JSON恢复节点并需要向下游发送数据时。
-   *   @see DataFlowGraphModel::loadNode
-   */
+     * @brief 链接产生时 触发
+     * AbstractGraphModel::connectionDeleted
+     * 调用对应被链接节点的
+     * NodeDelegateModel::inputConnectionDeleted
+     * 调用对应输出节点的
+     * NodeDelegateModel::outputConnectionDeleted
+     * @param connectionId 
+     */
+    void sendConnectionDeletion(ConnectionId const connectionId);
+    
+private Q_SLOTS:
+    /** 对于某节点，触发其下游数据 更新 
+    */
     void onOutPortDataUpdated(NodeId const nodeId, PortIndex const portIndex);
-
-    // 在分离连接后调用，将空数据传播到指定节点。
+    
+    /** 在分离连接后调用，将空数据传播到指定节点。
+     *  是的，链接断开时 触发的正是它
+     */
     void propagateEmptyDataTo(NodeId const nodeId, PortIndex const portIndex);
 
 private:
-    std::shared_ptr<NodeDelegateModelRegistry> _registry;
-
+    std::shared_ptr<NodeDelegateModelRegistry> _registry;   // 存放节点名与构造器的映射
     NodeId _nextNodeId;
-
-    std::unordered_map<NodeId, std::unique_ptr<NodeDelegateModel>> _models;
-
-    std::unordered_set<ConnectionId> _connectivity;
-
-    mutable std::unordered_map<NodeId, NodeGeometryData> _nodeGeometryData;
+    std::unordered_map<NodeId       , std::unique_ptr<NodeDelegateModel>> _models;                    // 节点 数组
+    std::unordered_set<ConnectionId> _connectivity;                                                   // 链接 数组
+    mutable                          std::unordered_map<NodeId, NodeGeometryData> _nodeGeometryData;  // 节点ID 及其对应的几何数据
 };
 
 } // namespace QtNodes

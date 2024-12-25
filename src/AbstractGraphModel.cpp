@@ -9,6 +9,7 @@ void AbstractGraphModel::portsAboutToBeDeleted(NodeId const nodeId,
                                                PortIndex const first,
                                                PortIndex const last)
 {
+    qDebug() << "AbstractGraphModel::portsAboutToBeDeleted";
     _shiftedByDynamicPortsConnections.clear();
 
     auto portCountRole = portType == PortType::In ? NodeRole::InPortCount : NodeRole::OutPortCount;
@@ -51,7 +52,9 @@ void AbstractGraphModel::portsAboutToBeDeleted(NodeId const nodeId,
 
 void AbstractGraphModel::portsDeleted()
 {
-    for (auto const connectionId : _shiftedByDynamicPortsConnections) {
+    qDebug() << "AbstractGraphModel::portsDeleted";
+    for (auto const connectionId : _shiftedByDynamicPortsConnections) 
+    {
         addConnection(connectionId);
     }
 
@@ -63,6 +66,9 @@ void AbstractGraphModel::portsAboutToBeInserted(NodeId const nodeId,
                                                 PortIndex const first,
                                                 PortIndex const last)
 {
+
+    qDebug() << "AbstractGraphModel::portsAboutToBeInserted";
+
     _shiftedByDynamicPortsConnections.clear();
 
     auto portCountRole = portType == PortType::In ? NodeRole::InPortCount : NodeRole::OutPortCount;
@@ -95,6 +101,7 @@ void AbstractGraphModel::portsAboutToBeInserted(NodeId const nodeId,
 
 void AbstractGraphModel::portsInserted()
 {
+    qDebug() << "AbstractGraphModel::portsInserted";
     for (auto const connectionId : _shiftedByDynamicPortsConnections) {
         addConnection(connectionId);
     }

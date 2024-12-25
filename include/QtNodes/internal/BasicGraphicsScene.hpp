@@ -27,45 +27,41 @@ class ConnectionGraphicsObject;
 class NodeGraphicsObject;
 class NodeStyle;
 
-/// QGraphicsScene 的一个实例，持有连接和节点的图形表示。
+// 视场
 class NODE_EDITOR_PUBLIC BasicGraphicsScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    /// 构造函数，传入一个图形模型
+    // 构造函数
     BasicGraphicsScene(AbstractGraphModel &graphModel, QObject *parent = nullptr);
-
     // 不支持没有模型的场景
     BasicGraphicsScene() = delete;
-
+    // 析构函数
     ~BasicGraphicsScene();
-
+    
 public:
-    /// 返回与场景关联的 AbstractGraphModel。
+    // 返回视图对应的 节点管理器
     AbstractGraphModel const &graphModel() const;
-
-    /// 返回可修改的 AbstractGraphModel 引用。
+    // 返回视图对应的 节点管理器 可修改版本
     AbstractGraphModel &graphModel();
 
-    /// 返回与场景关联的 AbstractNodeGeometry。
+    // 节点几何 类
     AbstractNodeGeometry &nodeGeometry();
 
-    /// 返回与场景关联的 AbstractNodePainter。
+    // 节点绘制器
     AbstractNodePainter &nodePainter();
-
-    /// 设置 NodePainter。
     void setNodePainter(std::unique_ptr<AbstractNodePainter> newPainter);
 
-    /// 返回场景的撤销堆栈。
+    // 撤销堆栈
     QUndoStack &undoStack();
 
 public:
+
     /// 创建一个“草稿”状态的 ConnectionGraphicsObject。
     /**
      * 场景缓存一个“草稿”连接，该连接只有一个松散的端点。
      * 在连接完成后，“草稿”连接会被删除，并创建一个正常的“完整”连接。
-     * 返回“草稿”连接，以便进行进一步的几何操作。
-     */
+     * 返回“草稿”连接，以便进行进一步的几何操作。 */
     std::unique_ptr<ConnectionGraphicsObject> const &makeDraftConnection(
         ConnectionId const newConnectionId);
 
@@ -76,66 +72,46 @@ public:
     */
     void resetDraftConnection();
 
-    /// 删除所有节点，连接会自动删除。
+    // 删除所有节点和连接，清空整个项目
     void clearScene();
 
 public:
-    /// 根据节点ID返回对应的 NodeGraphicsObject。
-    /**
-     * 如果未找到，返回 nullptr
-     */
+    // 获取 节点ID 对应的视图对象
     NodeGraphicsObject *nodeGraphicsObject(NodeId nodeId);
 
-    /// 根据连接ID返回对应的 ConnectionGraphicsObject。
-    /**
-     * 如果未找到，返回 nullptr。
-     */
+    // 获取 连接ID 对应的视图对象
     ConnectionGraphicsObject *connectionGraphicsObject(ConnectionId connectionId);
 
-    /// 返回场景的方向。
+    // 视图方向
     Qt::Orientation orientation() const { return _orientation; }
-
-    /// 设置场景的方向。
     void setOrientation(Qt::Orientation const orientation);
 
 public:
-    /// 可在子类中实现，返回场景的上下文菜单。
-    /**
-     * 默认实现返回 nullptr。
-     */
+    // 右键产出的 场景上下文菜单，应于子类中实现
     virtual QMenu *createSceneMenu(QPointF const scenePos);
 
 Q_SIGNALS:
     /// 场景被修改时触发信号。
     void modified(BasicGraphicsScene *);
-
     /// 节点位置发生变化时触发信号。
     void nodeMoved(NodeId const nodeId, QPointF const &newLocation);
-
     /// 节点被点击时触发信号。
     void nodeClicked(NodeId const nodeId);
-
     /// 节点被选中时触发信号。
     void nodeSelected(NodeId const nodeId);
-
     /// 节点被双击时触发信号。
     void nodeDoubleClicked(NodeId const nodeId);
-
     /// 节点被悬停时触发信号。
     void nodeHovered(NodeId const nodeId, QPoint const screenPos);
-
     /// 鼠标离开节点时触发信号。
     void nodeHoverLeft(NodeId const nodeId);
-
     /// 连接被悬停时触发信号。
     void connectionHovered(ConnectionId const connectionId, QPoint const screenPos);
-
     /// 鼠标离开连接时触发信号。
     void connectionHoverLeft(ConnectionId const connectionId);
-
     /// 当用户右键点击节点时，触发上下文菜单信号。
     void nodeContextMenu(NodeId const nodeId, QPointF const pos);
-
+    
 private:
     /// 创建节点和连接的图形对象。
     /**

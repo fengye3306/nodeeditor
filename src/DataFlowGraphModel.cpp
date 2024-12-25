@@ -10,7 +10,9 @@ namespace QtNodes {
 DataFlowGraphModel::DataFlowGraphModel(std::shared_ptr<NodeDelegateModelRegistry> registry)
     : _registry(std::move(registry))
     , _nextNodeId{0}
-{}
+{
+    
+}
 
 std::unordered_set<NodeId> DataFlowGraphModel::allNodeIds() const
 {
@@ -24,11 +26,10 @@ std::unordered_set<ConnectionId> DataFlowGraphModel::allConnectionIds(NodeId con
 {
     std::unordered_set<ConnectionId> result;
 
-    std::copy_if(_connectivity.begin(),
-                 _connectivity.end(),
-                 std::inserter(result, std::end(result)),
-                 [&nodeId](ConnectionId const &cid) {
-                     return cid.inNodeId == nodeId || cid.outNodeId == nodeId;
+    std::copy_if(_connectivity.begin(),_connectivity.end(),std::inserter(result, std::end(result)),
+                 [&nodeId](ConnectionId const &cid) 
+                 {
+                    return cid.inNodeId == nodeId || cid.outNodeId == nodeId;
                  });
 
     return result;
@@ -44,7 +45,7 @@ std::unordered_set<ConnectionId> DataFlowGraphModel::connections(NodeId nodeId,
                  _connectivity.end(),
                  std::inserter(result, std::end(result)),
                  [&portType, &portIndex, &nodeId](ConnectionId const &cid) {
-                     return (getNodeId(portType, cid) == nodeId
+                    return (getNodeId(portType, cid) == nodeId
                              && getPortIndex(portType, cid) == portIndex);
                  });
 
@@ -58,45 +59,54 @@ bool DataFlowGraphModel::connectionExists(ConnectionId const connectionId) const
 
 NodeId DataFlowGraphModel::addNode(QString const nodeType)
 {
+    // 节点构造函数
     std::unique_ptr<NodeDelegateModel> model = _registry->create(nodeType);
+    if (model)  // 如果model 存在
+    {
+        qDebug() << "DataFlowGraphModel::addNode: " << nodeType;
 
-    if (model) {
         NodeId newId = newNodeId();
 
-        connect(model.get(),
-                &NodeDelegateModel::dataUpdated,
+        /**
+         * @brief 绑定槽函数
+         */
+
+        // 当数据更新时触发此信号，更新下游的节点
+        connect(model.get(), &NodeDelegateModel::dataUpdated,
                 [newId, this](PortIndex const portIndex) {
+
                     onOutPortDataUpdated(newId, portIndex);
                 });
 
-        connect(model.get(),
-                &NodeDelegateModel::portsAboutToBeDeleted,
+        /** 
+         * 该函数通知图形模型，并使其移除并重新计算受影响的连接地址。
+         * 调用此函数以确保在数据被删除前，所有相关的连接都得到适当处理。
+        */ 
+        connect(model.get(),&NodeDelegateModel::portsAboutToBeDeleted,
                 this,
                 [newId, this](PortType const portType, PortIndex const first, PortIndex const last) {
                     portsAboutToBeDeleted(newId, portType, first, last);
                 });
-
-        connect(model.get(),
-                &NodeDelegateModel::portsDeleted,
+        /**端口已删除时 */
+        connect(model.get(), &NodeDelegateModel::portsDeleted,
                 this,
                 &DataFlowGraphModel::portsDeleted);
 
-        connect(model.get(),
-                &NodeDelegateModel::portsAboutToBeInserted,
+        /**端口将要插入 */
+        connect(model.get(), &NodeDelegateModel::portsAboutToBeInserted,
                 this,
-                [newId, this](PortType const portType, PortIndex const first, PortIndex const last) {
+                [newId, this](PortType const portType, PortIndex const first, PortIndex const last) 
+                {
                     portsAboutToBeInserted(newId, portType, first, last);
                 });
-
+        /**端口插入 */
         connect(model.get(),
                 &NodeDelegateModel::portsInserted,
                 this,
                 &DataFlowGraphModel::portsInserted);
 
         _models[newId] = std::move(model);
-
         Q_EMIT nodeCreated(newId);
-
         return newId;
     }
 
@@ -131,7 +141,6 @@ bool DataFlowGraphModel::connectionPossible(ConnectionId const connectionId) con
 void DataFlowGraphModel::addConnection(ConnectionId const connectionId)
 {
     _connectivity.insert(connectionId);
-
     sendConnectionCreation(connectionId);
 
     // 移除 使得当 链接时不再更新节点
@@ -519,12 +528,58 @@ void DataFlowGraphModel::load(QJsonObject const &jsonDocument)
     }
 }
 
+void DataFlowGraphModel::addPort(NodeId nodeId, PortType portType, PortIndex portIndex)
+{
+    // STAGE 1.
+    // Compute new addresses for the existing connections that are shifted and
+    // placed after the new ones
+    PortIndex first = portIndex;
+    PortIndex last = first;
+    portsAboutToBeInserted(nodeId, portType, first, last);
+
+    // // STAGE 2. Change the number of connections in your model
+    // if (portType == PortType::In)
+    //     _nodePortCounts[nodeId].in++;
+    // else
+    //     _nodePortCounts[nodeId].out++;
+
+    // STAGE 3. Re-create previouly existed and now shifted connections
+    portsInserted();
+
+    Q_EMIT nodeUpdated(nodeId);
+}
+
+void DataFlowGraphModel::removePort(NodeId nodeId, PortType portType, PortIndex portIndex)
+{
+    // STAGE 1.
+    // Compute new addresses for the existing connections that are shifted upwards
+    // instead of the deleted ports.
+    PortIndex first = portIndex;
+    PortIndex last = first;
+    portsAboutToBeDeleted(nodeId, portType, first, last);
+
+    // // STAGE 2. Change the number of connections in your model
+    // if (portType == PortType::In)
+    //     _nodePortCounts[nodeId].in--;
+    // else
+    //     _nodePortCounts[nodeId].out--;
+
+    portsDeleted();
+
+    Q_EMIT nodeUpdated(nodeId);
+}
+
+
+
+
+
+
+
 void DataFlowGraphModel::onOutPortDataUpdated(NodeId const nodeId, PortIndex const portIndex)
 {
     std::unordered_set<ConnectionId> const &connected = connections(nodeId,
                                                                     PortType::Out,
                                                                     portIndex);
-
     QVariant const portDataToPropagate = portData(nodeId, PortType::Out, portIndex, PortRole::Data);
 
     for (auto const &cn : connected) {
@@ -535,7 +590,6 @@ void DataFlowGraphModel::onOutPortDataUpdated(NodeId const nodeId, PortIndex con
 void DataFlowGraphModel::propagateEmptyDataTo(NodeId const nodeId, PortIndex const portIndex)
 {
     QVariant emptyData{};
-
     setPortData(nodeId, PortType::In, portIndex, emptyData, PortRole::Data);
 }
 

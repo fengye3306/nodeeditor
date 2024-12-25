@@ -89,8 +89,7 @@ public:
                              PortType portType,
                              PortIndex index,
                              QVariant const &value,
-                             PortRole role = PortRole::Data)
-        = 0;
+                             PortRole role = PortRole::Data) = 0;
 
     virtual bool deleteConnection(ConnectionId const connectionId) = 0;
 
@@ -101,26 +100,6 @@ public:
    */
     virtual QJsonObject saveNode(NodeId const) const { return {}; }
 
-    /**
-   * 如果你想支持以下操作，请重写此函数：
-   *
-   *   - 图的保存/恢复操作，
-   *   - 删除节点后的撤销/重做操作。
-   *
-   * QJsonObject 必须包含以下字段：
-   *
-   * ```
-   * {
-   *   id : 5,
-   *   position : { x : 100, y : 200 },
-   *   internal-data {
-   *     "您的模型特定数据在这里"
-   *   }
-   * }
-   * ```
-   *
-   * 该函数必须几乎与正常的 addNode() 做相同的事情。主要区别在于模型特定的 `inner-data` 处理。
-   */
     virtual void loadNode(QJsonObject const &) {}
 
 public:
@@ -133,7 +112,7 @@ public:
     /// 当模型不再有与给定端口索引关联的旧数据，并且节点必须重新绘制时，发出此信号。
     void portsDeleted();
 
-    /// 当模型即将在给定节点上创建新端口时，发出此信号。 first 是插入后新端口的第一个索引，last 是插入后新端口的最后一个索引。
+    // 此方法主要处理节点上端口数量的动态增加，确保因端口索引变化而受影响的连接能够被适当地更新。
     void portsAboutToBeInserted(NodeId const nodeId,
                                 PortType const portType,
                                 PortIndex const first,
